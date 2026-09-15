@@ -2,7 +2,7 @@ import SwiftUI
 
 struct MenuBarMenu: View {
     let state: AppState
-    @Environment(\.openSettings) private var openSettings
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         ForEach(state.sources) { source in
@@ -17,24 +17,14 @@ struct MenuBarMenu: View {
 
         Divider()
 
-        Button("Settings…", action: openSettingsInFront)
-            .keyboardShortcut(",")
+        Button("Settings…") {
+            openWindow(id: SettingsView.windowID)
+        }
+        .keyboardShortcut(",")
 
         Button("Quit SourceSwitch") {
             NSApp.terminate(nil)
         }
         .keyboardShortcut("q")
-    }
-
-    /// An app without a Dock icon isn't raised on activation, so order the window front ourselves.
-    private func openSettingsInFront() {
-        openSettings()
-        NSApp.activate()
-        DispatchQueue.main.async {
-            for window in NSApp.windows where window.canBecomeKey && !(window is NSPanel) {
-                window.makeKeyAndOrderFront(nil)
-                window.orderFrontRegardless()
-            }
-        }
     }
 }
