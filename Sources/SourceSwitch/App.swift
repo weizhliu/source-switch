@@ -26,13 +26,18 @@ struct SourceSwitchApp: App {
     }
 }
 
-/// Opening the app while it's already running (Spotlight, Finder, Dock) with no window
-/// showing should bring up the settings window — SwiftUI doesn't do that for a
-/// launch-suppressed `Window` on its own.
 @Observable
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var reopenRequests = 0
 
+    /// Closing the settings window must not quit the app; the hotkeys live in this process.
+    func applicationShouldTerminateAfterLastWindowClosed(_ application: NSApplication) -> Bool {
+        false
+    }
+
+    /// Opening the app while it's already running (Spotlight, Finder, Dock) with no window
+    /// showing should bring up the settings window — SwiftUI doesn't do that for a
+    /// launch-suppressed `Window` on its own.
     func applicationShouldHandleReopen(_ application: NSApplication, hasVisibleWindows: Bool) -> Bool {
         if !hasVisibleWindows { reopenRequests += 1 }
         return true
