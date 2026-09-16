@@ -2,8 +2,6 @@ import AppKit
 import Carbon
 import SwiftUI
 
-/// Shortcut field in the style of System Settings › Keyboard Shortcuts:
-/// click to record, press the combo, ✕ to clear. Esc cancels, ⌫ clears.
 struct ShortcutField: View {
     let source: InputSource
     let state: AppState
@@ -64,7 +62,6 @@ struct ShortcutField: View {
     }
 }
 
-/// Captures the next key combo typed anywhere in the app.
 @Observable
 private final class ShortcutCapture {
     enum Result { case captured(Shortcut), cleared, cancelled }
@@ -87,7 +84,6 @@ private final class ShortcutCapture {
         isCapturing = false
     }
 
-    /// Returns the event to let it propagate, nil to swallow it.
     private func handle(_ event: NSEvent, finish: (Result) -> Void) -> NSEvent? {
         guard event.type == .keyDown else {
             stop()

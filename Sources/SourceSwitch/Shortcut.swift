@@ -1,7 +1,6 @@
 import AppKit
 import Carbon
 
-/// A key combination in Carbon terms, which is what `RegisterEventHotKey` takes.
 struct Shortcut: Codable, Hashable, CustomStringConvertible {
     let keyCode: UInt32
     let carbonModifiers: UInt32
@@ -19,7 +18,6 @@ struct Shortcut: Codable, Hashable, CustomStringConvertible {
         self.carbonModifiers = carbonModifiers & Self.modifierMask
     }
 
-    /// Nil when the key-down isn't usable as a global hotkey.
     init?(keyDownEvent event: NSEvent) {
         let keyCode = UInt32(event.keyCode)
         let modifiers = Self.carbonModifiers(from: event.modifierFlags)
@@ -27,7 +25,7 @@ struct Shortcut: Codable, Hashable, CustomStringConvertible {
         self.init(keyCode: keyCode, carbonModifiers: modifiers)
     }
 
-    /// A function key on its own, or any key with ⌃, ⌥ or ⌘. (⇧ alone won't register.)
+    /// ⇧ alone won't register as a hotkey; function keys work unmodified.
     static func isUsableAsHotKey(keyCode: UInt32, carbonModifiers: UInt32) -> Bool {
         carbonModifiers & ~UInt32(shiftKey) != 0 || functionKeyCodes.contains(keyCode)
     }
@@ -41,10 +39,8 @@ struct Shortcut: Codable, Hashable, CustomStringConvertible {
         return modifiers
     }
 
-    /// "⌃⌥1", "⌘⇧Space", "F5" …
     var description: String { modifierSymbols + keyName }
 
-    /// Combos macOS has claimed for itself (Spotlight, screenshots, ⌃Space …).
     var isReservedBySystem: Bool {
         var unmanaged: Unmanaged<CFArray>?
         guard CopySymbolicHotKeys(&unmanaged) == noErr,
@@ -56,8 +52,6 @@ struct Shortcut: Codable, Hashable, CustomStringConvertible {
                 && (entry[kHISymbolicHotKeyModifiers] as? Int).map { UInt32($0) & Self.modifierMask } == carbonModifiers
         }
     }
-
-    // MARK: - Display
 
     private var modifierSymbols: String {
         var symbols = ""
@@ -85,7 +79,6 @@ struct Shortcut: Codable, Hashable, CustomStringConvertible {
         return Dictionary(uniqueKeysWithValues: names.map { (UInt32($0.key), $0.value) })
     }()
 
-    /// The character the key produces on the current ASCII-capable layout.
     private static func layoutCharacter(forKeyCode keyCode: UInt32) -> String? {
         guard let layout = TISCopyCurrentASCIICapableKeyboardLayoutInputSource()?.takeRetainedValue(),
               let dataPointer = TISGetInputSourceProperty(layout, kTISPropertyUnicodeKeyLayoutData)

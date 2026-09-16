@@ -1,12 +1,8 @@
 import Carbon
 
-/// A keyboard input source the user can switch to: a layout (ABC) or an IME mode (Zhuyin, Hiragana).
 struct InputSource: Identifiable, Hashable {
-    /// `com.apple.keylayout.ABC`, `com.apple.inputmethod.TCIM.Zhuyin`, …
     let id: String
-    /// Localized, e.g. "Zhuyin – Traditional".
     let name: String
-    /// Primary BCP-47 tag, e.g. "zh-Hant".
     let language: String?
 
     init(id: String, name: String, language: String?) {
@@ -15,7 +11,7 @@ struct InputSource: Identifiable, Hashable {
         self.language = language
     }
 
-    /// One glyph per source (Ａ / 注 / あ …), all the same width so the menu bar item never resizes.
+    /// Full-width so every glyph has the same width and the menu bar item never resizes.
     var menuBarGlyph: String {
         switch language {
         case "zh-Hant":
@@ -30,9 +26,8 @@ struct InputSource: Identifiable, Hashable {
         }
     }
 
-    /// The same sequence as macOS's own switcher (TextInputSwitcher): resolve the source by
-    /// ID, enable it even though it already is, then select it. Without the enable step other
-    /// apps often keep their old IME session while every indicator shows the new source.
+    /// TextInputSwitcher's sequence. Enabling an already-enabled source looks redundant, but
+    /// without it other apps keep their old IME session while every indicator shows the new one.
     @discardableResult
     func select() -> Bool {
         guard let ref = Self.sources(matching: [kTISPropertyInputSourceID: id]).first else { return false }
@@ -40,8 +35,7 @@ struct InputSource: Identifiable, Hashable {
         return TISSelectInputSource(ref) == noErr
     }
 
-    /// Enabled sources in System Settings order. Parent IMEs aren't select-capable and
-    /// palettes are another category, so both drop out.
+    /// Select-capable excludes parent IMEs; the category excludes palettes.
     static func allEnabled() -> [InputSource] {
         sources(matching: [
             kTISPropertyInputSourceCategory: kTISCategoryKeyboardInputSource,
@@ -55,7 +49,6 @@ struct InputSource: Identifiable, Hashable {
         TISCopyCurrentKeyboardInputSource().flatMap { InputSource($0.takeRetainedValue()) }
     }
 
-    /// "A" → "Ａ": printable ASCII mapped onto the Fullwidth Forms block.
     static func fullWidthForm(of text: String) -> String {
         String(text.unicodeScalars.map { scalar in
             guard (0x21...0x7E).contains(scalar.value),

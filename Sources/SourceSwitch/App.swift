@@ -35,9 +35,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         false
     }
 
-    /// Opening the app while it's already running (Spotlight, Finder, Dock) with no window
-    /// showing should bring up the settings window — SwiftUI doesn't do that for a
-    /// launch-suppressed `Window` on its own.
+    /// SwiftUI doesn't reopen a launch-suppressed `Window` when the running app is opened again.
     func applicationShouldHandleReopen(_ application: NSApplication, hasVisibleWindows: Bool) -> Bool {
         if !hasVisibleWindows { reopenRequests += 1 }
         return true

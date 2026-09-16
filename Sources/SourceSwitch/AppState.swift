@@ -3,13 +3,11 @@ import Foundation
 import Observation
 import ServiceManagement
 
-/// Single source of truth for the menu bar and Settings.
 @Observable
 final class AppState {
     private(set) var sources: [InputSource] = []
     private(set) var currentSourceID: String?
 
-    /// Persisted; every change re-registers the global hotkeys.
     private(set) var shortcuts: [InputSource.ID: Shortcut] = AppState.loadSavedShortcuts() {
         didSet {
             saveShortcuts()
@@ -48,7 +46,6 @@ final class AppState {
         shortcuts = Self.assigning(shortcut, to: source.id, in: shortcuts)
     }
 
-    /// A combo belongs to one source only: assigning it takes it away from any other source.
     static func assigning(_ shortcut: Shortcut?, to id: InputSource.ID,
                           in shortcuts: [InputSource.ID: Shortcut]) -> [InputSource.ID: Shortcut] {
         var updated = shortcuts.filter { $0.value != shortcut }
@@ -56,7 +53,7 @@ final class AppState {
         return updated
     }
 
-    /// While a shortcut is being recorded, pressing an existing combo must not switch sources.
+    /// While recording a shortcut, pressing an existing combo must not switch sources.
     func suspendHotKeys() {
         HotKeys.shared.unregisterAll()
     }

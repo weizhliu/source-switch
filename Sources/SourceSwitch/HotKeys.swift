@@ -1,7 +1,7 @@
 import Carbon
 
-/// System-wide hotkeys via Carbon's `RegisterEventHotKey`: still the only macOS API that
-/// fires in every app, needs no Accessibility permission, and swallows the keystroke.
+/// Carbon is still the only API for hotkeys that fire in every app, need no Accessibility
+/// permission, and swallow the keystroke.
 final class HotKeys {
     static let shared = HotKeys()
 
