@@ -14,7 +14,7 @@ struct InputSourceTests {
         ("com.apple.keylayout.French", "French", "fr", "Ｆ"),
     ])
     func menuBarGlyphIsOneFullWidthCharacter(id: String, name: String, language: String, expected: String) {
-        #expect(InputSource.menuBarGlyph(id: id, name: name, language: language) == expected)
+        #expect(InputSource(id: id, name: name, language: language).menuBarGlyph == expected)
     }
 
     @Test func fullWidthFormCoversPrintableASCIIOnly() {

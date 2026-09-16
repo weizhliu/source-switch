@@ -13,7 +13,7 @@ APP="$ROOT/build/$APP_NAME.app"
 # The Command Line Tools ship no SwiftUI macro plugin, and on the macOS 27 SDK even
 # `@State` is a macro, so compile against the 26.x SDK. With Xcode installed, unset this.
 SDK="${SDKROOT:-/Library/Developer/CommandLineTools/SDKs/MacOSX26.sdk}"
-SWIFT_FLAGS=(-c release --product "$APP_NAME" --sdk "$SDK")
+SWIFT_FLAGS=(-c release --sdk "$SDK")
 
 BIN_DIR="$(swift build "${SWIFT_FLAGS[@]}" --show-bin-path)"
 swift build "${SWIFT_FLAGS[@]}"
