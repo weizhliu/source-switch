@@ -41,6 +41,7 @@ Sources/SourceSwitch/
   App.swift            @main — MenuBarExtra + Settings scenes
   AppState.swift       @Observable state: sources, current, shortcuts, login item
   InputSource.swift    model + Text Input Source Services (Carbon) queries
+  FrontAppSelection.swift  have the front app select the source itself
   Shortcut.swift       key combo value: parse from NSEvent, "⌃⌥1" text, system-conflict check
   HotKeys.swift        global hotkeys via RegisterEventHotKey
   ShortcutField.swift  System Settings-style recorder field
@@ -59,10 +60,14 @@ Sources/IMEProbe/      front-app harness for scripts/ime-probe.sh
 - Hotkeys use Carbon's `RegisterEventHotKey`: still the only macOS API that is
   system-wide, needs no Accessibility permission, and swallows the keystroke.
   Modifier-only shortcuts (e.g. tapping Right ⌘ alone) are not supported.
-- Switching does what macOS's own switcher (TextInputSwitcher) does: resolve
-  the source by ID, `TISEnableInputSource`, then `TISSelectInputSource`.
-  Without the enable step, a change made from another process often isn't
-  applied by the front app's IME session even though every indicator says it was.
+- SourceSwitch switches the way macOS's own ⌃Space switcher does: it asks the
+  app with typing focus (which can be a Spotlight-style panel rather than the
+  frontmost app) to select the source itself (message 7 on that app's private
+  `com.apple.tsm.portname` port). Calling `TISSelectInputSource` from
+  another process changes every indicator, but the front app sometimes keeps
+  typing with its previous input method until it's reactivated. These private
+  functions are looked up at runtime; if one is missing, or SourceSwitch itself
+  is in front, it falls back to `TISSelectInputSource`.
 - The Command Line Tools ship no SwiftUI macro plugin, and on the macOS 27 SDK
   `@State` is a macro, so `scripts/build-app.sh` compiles against the 26.x SDK.
   With Xcode installed, drop the `--sdk` flag.

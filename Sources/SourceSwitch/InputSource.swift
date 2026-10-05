@@ -26,13 +26,13 @@ struct InputSource: Identifiable, Hashable {
         }
     }
 
-    /// TextInputSwitcher's sequence. Enabling an already-enabled source looks redundant, but
-    /// without it other apps keep their old IME session while every indicator shows the new one.
+    /// Has the front app select the source itself, as macOS's own switcher does: when
+    /// `TISSelectInputSource` changes the selection from another process, every indicator follows
+    /// but the front app sometimes keeps typing with its previous input method.
     @discardableResult
     func select() -> Bool {
         guard let ref = Self.sources(matching: [kTISPropertyInputSourceID: id]).first else { return false }
-        TISEnableInputSource(ref)
-        return TISSelectInputSource(ref) == noErr
+        return FrontAppSelection.ask(toSelect: ref) || TISSelectInputSource(ref) == noErr
     }
 
     /// Select-capable excludes parent IMEs; the category excludes palettes.
