@@ -14,6 +14,12 @@ let package = Package(
                 .linkedFramework("ServiceManagement"),
             ]
         ),
+        .executableTarget(
+            name: "IMEProbe",
+            path: "Sources/IMEProbe",
+            swiftSettings: [.defaultIsolation(MainActor.self)],
+            linkerSettings: [.linkedFramework("Carbon")]
+        ),
         .testTarget(
             name: "SourceSwitchTests",
             dependencies: ["SourceSwitch"],

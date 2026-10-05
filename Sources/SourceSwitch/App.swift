@@ -1,6 +1,18 @@
 import SwiftUI
 
 @main
+enum Launcher {
+    /// `SourceSwitch --select <id>` switches once and exits, so scripts/ime-probe.sh can switch
+    /// from another process with the app's own code, as a hotkey does.
+    static func main() {
+        if let flag = CommandLine.arguments.firstIndex(of: "--select"), CommandLine.arguments.indices.contains(flag + 1) {
+            let id = CommandLine.arguments[flag + 1]
+            exit(InputSource(id: id, name: id, language: nil).select() ? 0 : 1)
+        }
+        SourceSwitchApp.main()
+    }
+}
+
 struct SourceSwitchApp: App {
     @NSApplicationDelegateAdaptor private var delegate: AppDelegate
     @Environment(\.openWindow) private var openWindow

@@ -15,7 +15,17 @@ Requires the Command Line Tools with Swift 6.2+ and macOS 15+.
 
 ```sh
 scripts/test.sh                 # unit tests (Swift Testing)
+scripts/ime-probe.sh [rounds]   # end-to-end: does a switch reach the front app's IME?
+scripts/ime-probe.sh --native   # same check for macOS's own ⌃Space / ⌃⌥Space
 ```
+
+`ime-probe.sh` opens IMEProbe, a text view that stays frontmost while
+`SourceSwitch --select <id>` switches from another process, as a hotkey does.
+It types "ka" after each switch and reports which source actually handled it.
+It takes focus and changes the input source for about a minute, so don't type
+while it runs. It needs a keyboard layout and at least two input methods enabled.
+`--native` presses the real shortcuts, so IMEProbe needs Accessibility
+(System Settings › Privacy & Security › Accessibility); it asks on first run.
 
 ## Use
 
@@ -36,6 +46,7 @@ Sources/SourceSwitch/
   ShortcutField.swift  System Settings-style recorder field
   MenuBarMenu.swift    the dropdown
   SettingsView.swift   per-source row: label · name · shortcut field
+Sources/IMEProbe/      front-app harness for scripts/ime-probe.sh
 ```
 
 ## Notes
